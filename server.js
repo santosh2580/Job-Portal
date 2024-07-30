@@ -1,8 +1,15 @@
+
 import express from 'express';
-import 'express-async-errors';
+import 'express-async-errors'; // Middleware to handle async errors
 import dotenv from 'dotenv';
 import colors from 'colors';
 import morgan from 'morgan';
+
+//security packages
+import helmet from 'helmet';
+import xss from'xss-clean'
+import MongoSanitize from 'express-mongo-sanitize';
+
 
 // Import files
 import connectDB from './config/db.js';
@@ -11,8 +18,7 @@ import connectDB from './config/db.js';
 import testRoutes from './routes/testRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import jobRoutes from './routes/jobsRoutes.js'
-
+import jobRoutes from './routes/jobsRoutes.js';
 
 // Import error handling middleware
 import errorMiddleware from './middlewares/errorMiddleware.js';
@@ -32,8 +38,11 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(express.json());
-app.use(morgan('dev'));
+app.use(helmet());
+app.use(xss());
+app.use(MongoSanitize());
+app.use(express.json()); // Parse JSON bodies
+app.use(morgan('dev')); // HTTP request logger
 
 // Define routes
 app.use('/api/v1/test', testRoutes);
